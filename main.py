@@ -19,8 +19,25 @@ def extract(page_data):
     value = extractor.extract(page_data)["tours"]
     return value
 
+def send_email():
+    print("Email was sent!")
+
+def store(extracted):
+    with open("data.txt", "a", encoding="utf-8") as file:
+        file.write(extracted + "\n")
+
+def read(extracted):
+    with open("data.txt", "r") as file:
+        return file.read()
 
 if __name__ == "__main__":
-    scraped = scrape(URL)
-    extracted = extract(scraped)
-    print(extracted)
+    while True:
+        scraped = scrape(URL)
+        extracted = extract(scraped)
+        file_content = read(extracted)
+        print(extracted)
+        if extracted != "No upcoming tours":
+            if extracted not in file_content:
+                store(extracted)
+                send_email()
+                break
