@@ -1,5 +1,6 @@
 import requests
 import selectorlib
+from backend import send_email
 
 URL = "http://programmer100.pythonanywhere.com/tours/"
 
@@ -19,9 +20,6 @@ def extract(page_data):
     value = extractor.extract(page_data)["tours"]
     return value
 
-def send_email():
-    print("Email was sent!")
-
 def store(extracted):
     with open("data.txt", "a", encoding="utf-8") as file:
         file.write(extracted + "\n")
@@ -39,5 +37,5 @@ if __name__ == "__main__":
         if extracted != "No upcoming tours":
             if extracted not in file_content:
                 store(extracted)
-                send_email()
+                send_email(message="Hey, found a new event!")
                 break
