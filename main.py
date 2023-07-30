@@ -1,6 +1,8 @@
+from time import sleep
 import requests
 import selectorlib
 from backend import send_email
+import sqlite3
 
 URL = "http://programmer100.pythonanywhere.com/tours/"
 
@@ -8,6 +10,9 @@ URL = "http://programmer100.pythonanywhere.com/tours/"
 # we are getting the response from thinks that we are a web browser.
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+""" Connecting to the database """
+connection = sqlite3.connect("data.db")
 
 def scrape(url):
     """Scrape page info from url"""
@@ -21,21 +26,31 @@ def extract(page_data):
     return value
 
 def store(extracted):
-    with open("data.txt", "a", encoding="utf-8") as file:
-        file.write(extracted + "\n")
+    row = extracted.split(",")
+    row = [item.strip() for item in row]
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO events VALUES(?,?,?)", row)
+    connection.commit()
 
 def read(extracted):
-    with open("data.txt", "r") as file:
-        return file.read()
+    row = extracted.split(",")
+    row = [item.strip() for item in row]
+    band, city, date = row
+    cursor =  connection.cursor()
+    cursor.execute("SELECT * FROM events WHERE band=? AND city=? and date=?", (band, city, date))
+    rows = cursor.fetchall()
+    return rows
+
 
 if __name__ == "__main__":
     while True:
+        sleep(1)
         scraped = scrape(URL)
         extracted = extract(scraped)
-        file_content = read(extracted)
         print(extracted)
         if extracted != "No upcoming tours":
-            if extracted not in file_content:
+            row = read(extracted)
+            if not row:
                 store(extracted)
                 send_email(message="Hey, found a new event!")
-                break
+                #break
