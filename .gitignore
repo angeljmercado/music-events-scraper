@@ -1,5 +1,5 @@
 .env
 __pycache__
 /practice
-data.db
 data.sqbpro
+data.txt
