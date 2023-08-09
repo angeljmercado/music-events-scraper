@@ -52,5 +52,4 @@ if __name__ == "__main__":
             row = read(extracted)
             if not row:
                 store(extracted)
-                send_email(message="Hey, found a new event!")
-                #break
+                send_email(message="New event found!")
